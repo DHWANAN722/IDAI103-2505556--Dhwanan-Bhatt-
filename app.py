@@ -23,11 +23,7 @@ st.markdown("""
 h1, h2, h3, h4, h5, h6, p, div {
     color: white;
 }
-.stTextInput input, .stTextArea textarea {
-    background-color: #1f1f2e !important;
-    color: white !important;
-}
-.stSelectbox div {
+.stTextInput input {
     background-color: #1f1f2e !important;
     color: white !important;
 }
@@ -42,32 +38,11 @@ h1, h2, h3, h4, h5, h6, p, div {
 """, unsafe_allow_html=True)
 
 # -------------------------------
-# API KEY CONFIGURATION
+# SIDEBAR
 # -------------------------------
 
-# This works for Streamlit Cloud
-if "GEMINI_API_KEY" in st.secrets:
-    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-else:
-    st.error("API key not found. Add it in Streamlit Secrets.")
-    st.stop()
-
-# -------------------------------
-# MODEL SETUP (SAFE MODEL)
-# -------------------------------
-
-model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
-    generation_config={
-        "temperature": 0.4,
-        "top_p": 0.9,
-        "max_output_tokens": 1024,
-    }
-)
-
-# -------------------------------
-# SIDEBAR MOTIVATION
-# -------------------------------
+st.sidebar.title("🔑 API Configuration")
+user_api_key = st.sidebar.text_input("Enter your Gemini API Key:", type="password")
 
 quotes = [
     "It ain't about how hard you hit. It's about how hard you can get hit and keep moving forward.",
@@ -77,18 +52,18 @@ quotes = [
     "Hard work beats talent when talent doesn't work hard."
 ]
 
+st.sidebar.markdown("---")
 st.sidebar.title("🎬 Motivation Corner")
 st.sidebar.write(random.choice(quotes))
-st.sidebar.write("Powered by AI and stubborn ambition.")
 
 # -------------------------------
 # MAIN TITLE
 # -------------------------------
 
 st.title("🏆 CoachBot AI")
-st.subheader("Your AI-Powered Sports Coach")
+st.subheader("AI-Powered Personal Sports Coach")
 
-st.write("Train smarter. Recover safer. Improve consistently.")
+st.write("Bring your own API key. Train smarter.")
 
 # -------------------------------
 # USER INPUT SECTION
@@ -124,41 +99,55 @@ feature = st.selectbox(
 
 if st.button("🚀 Generate My Plan"):
 
-    if not sport or not position:
+    if not user_api_key:
+        st.error("Please enter your Gemini API key in the sidebar.")
+    elif not sport or not position:
         st.warning("Please enter at least your sport and position.")
     else:
-        prompt = f"""
-        You are a professional youth sports coach.
-
-        Athlete Profile:
-        Sport: {sport}
-        Position: {position}
-        Goal: {goal}
-        Injury: {injury}
-        Diet: {diet}
-        Intensity Level: {intensity}
-
-        Generate a structured {feature}.
-
-        Requirements:
-        - Safe for teenage athletes
-        - Clear headings
-        - Step-by-step format
-        - Include duration
-        - Include safety precautions
-        - Include injury prevention tips if relevant
-        - Motivating but realistic tone
-        """
-
         try:
-            with st.spinner("Creating your personalized coaching plan..."):
+            # Configure Gemini dynamically
+            genai.configure(api_key=user_api_key)
+
+            model = genai.GenerativeModel(
+                model_name="gemini-1.5-flash",
+                generation_config={
+                    "temperature": 0.4,
+                    "top_p": 0.9,
+                    "max_output_tokens": 1024,
+                }
+            )
+
+            prompt = f"""
+            You are a professional youth sports coach.
+
+            Athlete Profile:
+            Sport: {sport}
+            Position: {position}
+            Goal: {goal}
+            Injury: {injury}
+            Diet: {diet}
+            Intensity Level: {intensity}
+
+            Generate a structured {feature}.
+
+            Requirements:
+            - Safe for teenage athletes
+            - Clear headings
+            - Step-by-step format
+            - Include duration
+            - Include safety precautions
+            - Include injury prevention tips if relevant
+            - Motivating but realistic tone
+            """
+
+            with st.spinner("Generating your custom plan..."):
                 response = model.generate_content(prompt)
 
-            st.success("Your personalized plan is ready 👇")
+            st.success("Your personalized training plan 👇")
             st.markdown(response.text)
 
         except Exception as e:
-            st.error("Error generating response. Check API key and model access.")
+            st.error("Something went wrong. Check your API key.")
             st.write(str(e))
 
 # -------------------------------
@@ -166,5 +155,5 @@ if st.button("🚀 Generate My Plan"):
 # -------------------------------
 
 st.markdown("---")
-st.markdown("Built using Streamlit + Gemini 1.5 Flash")
-
+st.markdown("Built with Streamlit + Gemini 1.5 Flash")
+st.markdown("Your key. Your AI. Your grind.")
