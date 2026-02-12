@@ -1,5 +1,5 @@
 import streamlit as st
-import google.generativeai as gemini 
+import google.generativeai as genai
 from datetime import datetime
 
 # Page configuration
