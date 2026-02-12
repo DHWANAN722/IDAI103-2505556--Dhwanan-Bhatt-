@@ -1,116 +1,99 @@
 import streamlit as st
 from openai import OpenAI
-import random
 
-# -----------------------------
+# -------------------------
 # PAGE CONFIG
-# -----------------------------
-st.set_page_config(page_title="Elite Sports AI", page_icon="🏆", layout="wide")
+# -------------------------
+st.set_page_config(page_title="Elite Sports AI", layout="wide")
 
-# -----------------------------
-# CUSTOM DARK THEME
-# -----------------------------
+# -------------------------
+# SIMPLE WHITE STYLE
+# -------------------------
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(135deg, #0f001f, #1a0033, #2b0057);
-        color: white;
-    }
-    h1, h2, h3 {
-        color: #ffffff;
-    }
-    .quote-box {
-        position: fixed;
-        bottom: 10px;
-        right: 20px;
-        font-size: 14px;
-        opacity: 0.7;
+        background-color: white;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------
-# FUN SPORTS QUOTES
-# -----------------------------
-quotes = [
-    "Hard work beats talent when talent doesn't work hard.",
-    "Pain is temporary. Victory screenshots last forever.",
-    "You miss 100% of the shots you don’t take.",
-    "Leg day builds character. And fear.",
-    "Champions train. Everyone else explains."
-]
-
-st.markdown(f"<div class='quote-box'>🏀 {random.choice(quotes)}</div>", unsafe_allow_html=True)
-
-# -----------------------------
-# TITLE
-# -----------------------------
 st.title("🏆 Elite Sports Performance AI")
-st.subheader("Build your personalized domination plan.")
+st.write("Generate a complete, structured training plan tailored to you.")
 
-# -----------------------------
+# -------------------------
 # API KEY INPUT
-# -----------------------------
+# -------------------------
 api_key = st.text_input("Enter your OpenAI API Key:", type="password")
 
-if api_key:
+if not api_key:
+    st.info("Please enter your API key to continue.")
+    st.stop()
+
+# Create client safely
+try:
     client = OpenAI(api_key=api_key)
+except Exception as e:
+    st.error("Invalid API Key format.")
+    st.stop()
 
-    # -----------------------------
-    # USER INPUTS
-    # -----------------------------
-    sport = st.text_input("Sport")
-    position = st.text_input("Position")
-    experience = st.selectbox("Experience Level", ["Beginner", "Intermediate", "Advanced"])
-    goal = st.text_area("Main Goal (Be specific)")
+# -------------------------
+# USER INPUTS
+# -------------------------
+sport = st.text_input("Sport")
+position = st.text_input("Position")
+experience = st.selectbox("Experience Level", ["Beginner", "Intermediate", "Advanced"])
+goal = st.text_area("Main Goal")
 
-    if st.button("Generate Elite Plan 🚀"):
+# -------------------------
+# GENERATE BUTTON
+# -------------------------
+if st.button("Generate Plan"):
 
-        if sport and position and goal:
+    if not sport or not position or not goal:
+        st.warning("Please fill in all fields.")
+        st.stop()
 
-            with st.spinner("Building your elite training blueprint..."):
+    with st.spinner("Building your elite training plan..."):
 
-                prompt = f"""
-You are an elite-level strength and conditioning coach.
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are an elite sports performance coach. Give detailed, structured, professional plans. Avoid generic advice."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"""
+Create a COMPLETE training plan.
 
-Create a COMPLETE, detailed, structured performance training plan.
-
-Athlete Profile:
 Sport: {sport}
 Position: {position}
 Experience: {experience}
 Main Goal: {goal}
 
-The response MUST include:
-1. Weekly training split
+Include:
+1. Weekly training schedule
 2. Strength program
-3. Conditioning plan
-4. Skill development drills
+3. Conditioning drills
+4. Skill work
 5. Recovery strategy
-6. Mental toughness training
-7. Nutrition guidance
-8. Weekly progression strategy
+6. Nutrition guidance
+7. Mental training
+8. Progression plan
 
-Make it detailed, specific, and tailored to the sport.
-Avoid generic advice.
-Make it motivational but professional.
+Be specific and detailed.
 """
+                    }
+                ],
+                temperature=0.8,
+                max_tokens=1800
+            )
 
-                response = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {"role": "system", "content": "You are a high-performance sports coach AI that gives structured, elite-level plans."},
-                        {"role": "user", "content": prompt}
-                    ],
-                    temperature=0.9,
-                    max_tokens=1500
-                )
+            output = response.choices[0].message.content
+            st.markdown("## 📋 Your Personalized Plan")
+            st.write(output)
 
-                output = response.choices[0].message.content
-                st.markdown("## 📋 Your Personalized Plan")
-                st.write(output)
-
-        else:
-            st.warning("Fill out all fields before generating your plan.")
-else:
-    st.info("Enter your API key above to unlock the app.")
+        except Exception as e:
+            st.error("Authentication failed or API error. Double-check your API key.")
