@@ -1,7 +1,7 @@
 
 
 # CoachBot AI – A Generative AI-Powered Smart Fitness Web Application
-
+App Link: https://ofreyuftfsdtwekjxcte2f.streamlit.app/
 ## Introduction
 
 CoachBot AI is a generative AI-powered web application designed to provide personalized sports coaching, training plans, recovery guidance, and nutrition advice for young athletes. The application leverages Google’s Gemini 1.5 Pro model and integrates it within a Streamlit-based web interface to deliver real-time, adaptive coaching recommendations.
