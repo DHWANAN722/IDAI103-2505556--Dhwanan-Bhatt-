@@ -3,86 +3,95 @@ import google.generativeai as genai
 import random
 
 # -------------------------------
-# CONFIGURATION
+# PAGE CONFIG
 # -------------------------------
-
 st.set_page_config(
     page_title="CoachBot AI",
     page_icon="🏆",
     layout="wide"
 )
 
-# Dark Purple + Black Theme Styling
+# -------------------------------
+# DARK THEME STYLING
+# -------------------------------
 st.markdown("""
-    <style>
-    body {
-        background-color: #0f0f1a;
-        color: white;
-    }
-    .stApp {
-        background: linear-gradient(135deg, #0f0f1a, #1a0033);
-        color: white;
-    }
-    .stTextInput > div > div > input {
-        background-color: #1f1f2e;
-        color: white;
-    }
-    .stTextArea > div > div > textarea {
-        background-color: #1f1f2e;
-        color: white;
-    }
-    .stButton>button {
-        background-color: #8000ff;
-        color: white;
-        border-radius: 12px;
-        height: 3em;
-        width: 100%;
-        font-size: 18px;
-    }
-    </style>
+<style>
+.stApp {
+    background: linear-gradient(135deg, #0f0f1a, #1a0033);
+    color: white;
+}
+h1, h2, h3, h4, h5, h6, p, div {
+    color: white;
+}
+.stTextInput input, .stTextArea textarea {
+    background-color: #1f1f2e !important;
+    color: white !important;
+}
+.stSelectbox div {
+    background-color: #1f1f2e !important;
+    color: white !important;
+}
+.stButton>button {
+    background-color: #8000ff;
+    color: white;
+    border-radius: 10px;
+    height: 3em;
+    font-size: 16px;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # -------------------------------
-# GEMINI SETUP
+# API KEY CONFIGURATION
 # -------------------------------
 
-genai.configure(api_key="YOUR_API_KEY_HERE")
+# This works for Streamlit Cloud
+if "GEMINI_API_KEY" in st.secrets:
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+else:
+    st.error("API key not found. Add it in Streamlit Secrets.")
+    st.stop()
+
+# -------------------------------
+# MODEL SETUP (SAFE MODEL)
+# -------------------------------
 
 model = genai.GenerativeModel(
-    "gemini-1.5-pro",
+    model_name="gemini-1.5-flash",
     generation_config={
         "temperature": 0.4,
-        "top_p": 0.9
+        "top_p": 0.9,
+        "max_output_tokens": 1024,
     }
 )
 
 # -------------------------------
-# FUN QUOTES SECTION
+# SIDEBAR MOTIVATION
 # -------------------------------
 
 quotes = [
-    "“It ain’t about how hard you hit. It’s about how hard you can get hit and keep moving forward.” – Rocky",
-    "“Clear eyes, full hearts, can’t lose.” – Friday Night Lights",
-    "“You miss 100% of the shots you don’t take.” – Wayne Gretzky",
-    "“Pain is temporary. Pride is forever.”",
-    "“Hard work beats talent when talent doesn’t work hard.”"
+    "It ain't about how hard you hit. It's about how hard you can get hit and keep moving forward.",
+    "You miss 100% of the shots you don’t take.",
+    "Clear eyes, full hearts, can’t lose.",
+    "Pain is temporary. Pride is forever.",
+    "Hard work beats talent when talent doesn't work hard."
 ]
 
 st.sidebar.title("🎬 Motivation Corner")
 st.sidebar.write(random.choice(quotes))
-st.sidebar.write("💪 Powered by caffeine and questionable life choices.")
+st.sidebar.write("Powered by AI and stubborn ambition.")
 
 # -------------------------------
 # MAIN TITLE
 # -------------------------------
 
 st.title("🏆 CoachBot AI")
-st.subheader("Your slightly dramatic AI Sports Coach")
+st.subheader("Your AI-Powered Sports Coach")
 
-st.write("Train smarter. Recover safer. Dominate legally.")
+st.write("Train smarter. Recover safer. Improve consistently.")
 
 # -------------------------------
-# INPUT SECTION
+# USER INPUT SECTION
 # -------------------------------
 
 col1, col2 = st.columns(2)
@@ -98,7 +107,7 @@ with col2:
     intensity = st.selectbox("⚡ Training Intensity", ["Low", "Moderate", "High"])
 
 feature = st.selectbox(
-    "🎯 What do you need today?",
+    "🎯 What do you need?",
     [
         "Full Training Plan",
         "Injury Recovery Plan",
@@ -116,7 +125,7 @@ feature = st.selectbox(
 if st.button("🚀 Generate My Plan"):
 
     if not sport or not position:
-        st.warning("Tell me at least your sport and position. I’m good, not psychic.")
+        st.warning("Please enter at least your sport and position.")
     else:
         prompt = f"""
         You are a professional youth sports coach.
@@ -129,34 +138,33 @@ if st.button("🚀 Generate My Plan"):
         Diet: {diet}
         Intensity Level: {intensity}
 
-        Generate a {feature}.
+        Generate a structured {feature}.
 
-        Keep the advice:
-        - Safe for teenagers
-        - Practical
-        - Structured with headings
-        - Motivating but not unrealistic
-        - Scientifically sound
-
-        Include:
-        - Clear steps
-        - Duration
-        - Safety notes
-        - Injury prevention tips if relevant
+        Requirements:
+        - Safe for teenage athletes
+        - Clear headings
+        - Step-by-step format
+        - Include duration
+        - Include safety precautions
+        - Include injury prevention tips if relevant
+        - Motivating but realistic tone
         """
 
-        with st.spinner("Analyzing your greatness..."):
-            response = model.generate_content(prompt)
+        try:
+            with st.spinner("Creating your personalized coaching plan..."):
+                response = model.generate_content(prompt)
 
-        st.success("Here’s your custom AI coaching plan 👇")
-        st.markdown(response.text)
+            st.success("Your personalized plan is ready 👇")
+            st.markdown(response.text)
 
-        st.info("Remember: AI is smart. But listen to your real coach and your body too.")
+        except Exception as e:
+            st.error("Error generating response. Check API key and model access.")
+            st.write(str(e))
 
 # -------------------------------
 # FOOTER
 # -------------------------------
 
 st.markdown("---")
-st.markdown("Built with ❤️ + Gemini 1.5 Pro")
-st.markdown("If this plan feels too easy, you're either elite or lying about intensity.")
+st.markdown("Built using Streamlit + Gemini 1.5 Flash")
+
