@@ -55,7 +55,7 @@ def generate_response(prompt, api_key, temperature=0.7):
     """Generate response from Gemini AI"""
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-pro')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(
             prompt,
             generation_config=genai.GenerationConfig(
@@ -516,7 +516,7 @@ Make it realistic and achievable."""
     st.markdown("""
     <div style='text-align: center; color: #6b7280; padding: 1rem;'>
         <p>🏆 <strong>CoachBot AI</strong> - Empowering Young Athletes with AI-Powered Coaching</p>
-        <p>Powered by Google Gemini 1.5 Pro | Built with Streamlit</p>
+        <p>Powered by Google Gemini 1.5 Flash | Built with Streamlit</p>
         <p style='font-size: 0.9rem;'>⚠️ Always consult qualified coaches and medical professionals</p>
     </div>
     """, unsafe_allow_html=True)
