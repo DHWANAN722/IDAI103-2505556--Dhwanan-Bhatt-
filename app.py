@@ -1,171 +1,97 @@
 import streamlit as st
-import google.generativeai as genai
-import random
+from openai import OpenAI
 
-# ---------------------------------
+# -------------------------
 # PAGE CONFIG
-# ---------------------------------
-st.set_page_config(
-    page_title="CoachBot AI",
-    page_icon="🏆",
-    layout="wide"
-)
+# -------------------------
+st.set_page_config(page_title="Elite Sports AI", layout="wide")
 
-# ---------------------------------
-# DARK THEME
-# ---------------------------------
-st.markdown("""
-<style>
-.stApp {
-    background: linear-gradient(135deg, #0f0f1a, #1a0033);
-    color: white;
-}
-h1, h2, h3, h4, h5, h6, p, div {
-    color: white;
-}
-.stTextInput input, .stSelectbox div {
-    background-color: #1f1f2e !important;
-    color: white !important;
-}
-.stButton>button {
-    background-color: #8000ff;
-    color: white;
-    border-radius: 10px;
-    height: 3em;
-    font-size: 16px;
-}
-</style>
-""", unsafe_allow_html=True)
+st.title("🏆 Elite Sports Performance AI")
+st.write("Generate a complete, structured, elite-level training plan.")
 
-# ---------------------------------
-# SIDEBAR - API KEY
-# ---------------------------------
-st.sidebar.title("🔑 API Setup")
-user_api_key = st.sidebar.text_input("Enter your Gemini API Key:", type="password")
+# -------------------------
+# API KEY INPUT
+# -------------------------
+api_key = st.text_input("Enter your OpenAI API Key:", type="password")
 
-quotes = [
-    "It ain't about how hard you hit. It's about how hard you can get hit and keep moving forward.",
-    "You miss 100% of the shots you don’t take.",
-    "Clear eyes, full hearts, can’t lose.",
-    "Pain is temporary. Pride is forever.",
-    "Hard work beats talent when talent doesn't work hard."
-]
+if not api_key:
+    st.info("Please enter your API key to continue.")
+    st.stop()
 
-st.sidebar.markdown("---")
-st.sidebar.title("🎬 Motivation Corner")
-st.sidebar.write(random.choice(quotes))
+try:
+    client = OpenAI(api_key=api_key)
+except Exception:
+    st.error("Invalid API key format.")
+    st.stop()
 
-# ---------------------------------
-# MAIN TITLE
-# ---------------------------------
-st.title("🏆 CoachBot AI")
-st.subheader("AI-Powered Personal Sports Coach")
+# -------------------------
+# USER INPUTS
+# -------------------------
+sport = st.text_input("Sport")
+position = st.text_input("Position")
+experience = st.selectbox("Experience Level", ["Beginner", "Intermediate", "Advanced"])
+goal = st.text_area("Main Goal (be specific)")
 
-st.write("Bring your own API key. Train smarter. Improve consistently.")
-
-# ---------------------------------
-# USER INPUT
-# ---------------------------------
-col1, col2 = st.columns(2)
-
-with col1:
-    sport = st.text_input("🏈 Sport")
-    position = st.text_input("🎯 Position")
-    goal = st.text_input("🔥 Main Goal")
-
-with col2:
-    injury = st.text_input("🩹 Injury History")
-    diet = st.text_input("🥗 Diet Preference")
-    intensity = st.selectbox("⚡ Training Intensity", ["Low", "Moderate", "High"])
-
-feature = st.selectbox(
-    "🎯 What do you need?",
-    [
-        "Full Training Plan",
-        "Injury Recovery Plan",
-        "Nutrition Guide",
-        "Tactical Advice",
-        "Mental Preparation Routine",
-        "Warm-up & Cooldown Plan"
-    ]
-)
-
-# ---------------------------------
-# SAFE MODEL DETECTION FUNCTION
-# ---------------------------------
-def get_available_model():
-    models = genai.list_models()
-    for m in models:
-        if "generateContent" in m.supported_generation_methods:
-            return m.name
-    return None
-
-# ---------------------------------
+# -------------------------
 # GENERATE BUTTON
-# ---------------------------------
-if st.button("🚀 Generate My Plan"):
+# -------------------------
+if st.button("Generate Plan"):
 
-    if not user_api_key:
-        st.error("Please enter your Gemini API key in the sidebar.")
+    if not sport or not position or not goal:
+        st.warning("Please fill in all fields.")
         st.stop()
 
-    if not sport or not position:
-        st.warning("Please enter at least your sport and position.")
-        st.stop()
+    with st.spinner("Creating your elite performance blueprint..."):
 
-    try:
-        genai.configure(api_key=user_api_key)
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are an elite professional strength and conditioning coach. "
+                            "You produce detailed, structured, sport-specific training plans. "
+                            "Avoid generic advice. Be specific, tactical, and practical."
+                        )
+                    },
+                    {
+                        "role": "user",
+                        "content": f"""
+Create a COMPLETE, highly detailed performance training plan.
 
-        model_name = get_available_model()
+Athlete Profile:
+Sport: {sport}
+Position: {position}
+Experience Level: {experience}
+Main Goal: {goal}
 
-        if not model_name:
-            st.error("No compatible Gemini model found for your API key.")
-            st.stop()
+The response MUST include:
 
-        model = genai.GenerativeModel(
-            model_name=model_name,
-            generation_config={
-                "temperature": 0.4,
-                "top_p": 0.9,
-                "max_output_tokens": 1024,
-            }
-        )
+1. Weekly training split (day-by-day)
+2. Strength & power program (sets, reps)
+3. Conditioning plan
+4. Skill-specific drills
+5. Recovery strategy
+6. Nutrition framework
+7. Mental performance training
+8. 4-week progression strategy
 
-        prompt = f"""
-        You are a professional youth sports coach.
+Make it structured with clear headings.
+Be specific to the sport and position.
+No vague motivational fluff.
+"""
+                    }
+                ],
+                temperature=0.85,
+                max_tokens=2000
+            )
 
-        Athlete Profile:
-        Sport: {sport}
-        Position: {position}
-        Goal: {goal}
-        Injury: {injury}
-        Diet: {diet}
-        Intensity Level: {intensity}
+            output = response.choices[0].message.content
 
-        Generate a structured {feature}.
+            st.markdown("## 📋 Your Personalized Plan")
+            st.write(output)
 
-        Requirements:
-        - Safe for teenage athletes
-        - Clear headings
-        - Step-by-step format
-        - Include duration
-        - Include safety precautions
-        - Include injury prevention tips if relevant
-        - Motivating but realistic tone
-        """
+        except Exception as e:
+            st.error("Authentication failed or API issue. Double-check your API key.")
 
-        with st.spinner("Generating your personalized training plan..."):
-            response = model.generate_content(prompt)
-
-        st.success("Your personalized plan 👇")
-        st.markdown(response.text)
-
-    except Exception as e:
-        st.error("Something went wrong. Check your API key or model access.")
-        st.write(str(e))
-
-# ---------------------------------
-# FOOTER
-# ---------------------------------
-st.markdown("---")
-st.markdown("Built with Streamlit + Gemini API")
