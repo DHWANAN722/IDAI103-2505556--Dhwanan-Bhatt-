@@ -55,7 +55,7 @@ def generate_response(prompt, api_key, temperature=0.7):
     """Generate response from Gemini AI"""
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-pro')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(
             prompt,
             generation_config=genai.GenerationConfig(
