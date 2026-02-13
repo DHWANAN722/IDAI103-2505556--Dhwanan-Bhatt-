@@ -2,110 +2,105 @@ import streamlit as st
 import google.generativeai as genai
 import random
 
-# --- PAGE CONFIGURATION ---
+# --- PAGE CONFIG ---
 st.set_page_config(page_title="CoachBot AI", layout="wide")
 
-# --- CUSTOM STYLING (Fixed Button Visibility & Dark Theme) ---
+# --- CUSTOM UI STYLING ---
 st.markdown("""
     <style>
-    /* Dark Gradient Background */
+    /* Dark Purple / Black Background */
     .stApp {
-        background: linear-gradient(to bottom, #000000, #1a0b2e);
+        background: linear-gradient(180deg, #000000 0%, #2D0B4B 100%);
         color: white;
     }
     
-    /* Make Button Text Visible (Bright White) */
+    /* FIX: Button Visibility - Black text on bright purple background */
     div.stButton > button {
-        background-color: #bb86fc !important;
-        color: #000000 !important; /* Black text on purple button for high contrast */
+        background-color: #BB86FC !important;
+        color: #000000 !important;
         font-weight: bold !important;
-        border-radius: 8px !important;
-        border: none !important;
-        width: 100%;
+        border: 2px solid #BB86FC !important;
+        border-radius: 10px !important;
+        padding: 10px 24px !important;
     }
     
     div.stButton > button:hover {
         background-color: #ffffff !important;
-        color: #1a0b2e !important;
+        color: #000000 !important;
+        border: 2px solid #ffffff !important;
     }
 
-    /* Styling for text inputs and boxes */
-    .stTextInput textarea, .stSelectbox div[data-baseweb="select"] {
-        background-color: #1e1e2f !important;
+    /* Input box styling */
+    .stTextInput>div>div>input, .stTextArea>div>div>textarea {
+        background-color: #1A1A1A !important;
         color: white !important;
     }
-    
-    h1, h2, h3 { color: #bb86fc !important; }
 
-    .quote-box {
-        background-color: #2e1a47;
+    /* Sidebar Quote Styling */
+    .quote-style {
+        background-color: #3D1466;
         padding: 15px;
         border-radius: 10px;
-        border-left: 5px solid #bb86fc;
-        margin-bottom: 20px;
+        border-left: 5px solid #BB86FC;
+        font-style: italic;
     }
     </style>
     """, unsafe_allow_html=True)
 
 # --- FUN QUOTES ---
-quotes = [
+fun_quotes = [
     "“It ain’t about how hard you hit. It’s about how hard you can get hit and keep moving forward.” – Rocky Balboa",
     "“Designated for assignment? I’m the best there is!” – Happy Gilmore",
-    "“I’ll be back.” – The Terminator (for your next set!)",
-    "“Hard work beats talent when talent doesn’t work hard.” – Tim Notke"
+    "“Winning isn’t everything, it’s the only thing.” – Vince Lombardi",
+    "“I’ll be back.” – Terminator (for your next set)",
+    "“Just keep swimming.” – Dory",
+    "“May the Force be with your gains.” – Star Wars"
 ]
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.title("⚙️ CoachBot Settings")
+    st.title("Settings")
     api_key = st.text_input("Enter Gemini API Key", type="password")
-    temp = st.slider("Coach Creativity", 0.0, 1.0, 0.4)
+    
     st.markdown("---")
-    st.markdown(f'<div class="quote-box"><b>Daily Motivation:</b><br>{random.choice(quotes)}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="quote-style">{random.choice(fun_quotes)}</div>', unsafe_allow_html=True)
 
-# --- MAIN UI ---
-st.title("⚡ CoachBot AI: NextGen Sports Lab")
-st.subheader("Your AI-powered Personal Trainer")
+# --- MAIN CONTENT ---
+st.title("⚡ CoachBot AI")
+st.write("Developing the next generation of athletes with AI-driven training.")
 
 if not api_key:
-    st.warning("Please enter your API Key in the sidebar.")
+    st.info("Please enter your API key in the sidebar to start training.")
 else:
-    # CONFIGURATION FIX: Try 'gemini-1.5-flash' if 'gemini-1.5-pro' continues to 404
-    # Ensure you use the exact string: 'gemini-1.5-pro'
-    genai.configure(api_key=api_key)
-    
-    # Selecting the model 
-    # NOTE: If 1.5-pro fails, 'gemini-1.5-flash' is a highly reliable alternative
-    model = genai.GenerativeModel('gemini-1.5-pro')
+    try:
+        genai.configure(api_key=api_key)
+        # Using gemini-1.5-flash to avoid the 404 error
+        model = genai.GenerativeModel('gemini-1.5-flash')
 
-    col1, col2 = st.columns(2)
-    with col1:
-        sport = st.selectbox("Your Sport", ["Football", "Cricket", "Basketball", "Athletics"])
-        position = st.text_input("Position", placeholder="e.g. Goalkeeper")
-    with col2:
-        injury = st.text_area("Injury History", value="None")
-        goal = st.selectbox("Goal", ["Recovery", "Strength", "Speed", "Tactics"])
+        col1, col2 = st.columns(2)
+        with col1:
+            sport = st.selectbox("Sport", ["Football", "Cricket", "Basketball", "Athletics", "Rugby"])
+            position = st.text_input("Player Position", placeholder="e.g. Midfielder / Bowler")
+        with col2:
+            injury = st.text_area("Injury History", placeholder="e.g. Knee strain, none")
+            goal = st.selectbox("Current Goal", ["Build Stamina", "Speed", "Tactical Skills", "Recovery"])
 
-    if st.button("GET MY TRAINING PLAN 🚀"):
-        prompt = f"As a youth coach, create a {goal} plan for a {sport} {position} with {injury} history."
-        
-        with st.spinner("Consulting the playbook..."):
-            try:
-                # The generate_content method is required by the assignment 
-                response = model.generate_content(prompt)
-                st.markdown("### 📋 Your Personalized Plan")
-                st.write(response.text)
-            except Exception as e:
-                # If 1.5-pro is still not found, try the flash version automatically
-                if "404" in str(e):
-                    st.info("Switching to Gemini 1.5 Flash for compatibility...")
-                    model = genai.GenerativeModel('gemini-1.5-flash')
-                    response = model.generate_content(prompt)
-                    st.markdown(response.text)
-                else:
-                    st.error(f"Error: {e}")
-    
-
-# --- FOOTER ---
-st.markdown("---")
-st.caption("Developed for NextGen Sports Lab | Powered by Gemini 1.5 Pro")
+        if st.button("GENERATE COACHING PLAN 🚀"):
+            # Prompt Engineering based on Scenario 2 requirements 
+            user_prompt = f"""
+            Act as a professional youth sports coach. Create a plan for:
+            - Sport: {sport}
+            - Position: {position}
+            - Goal: {goal}
+            - Health/Injury History: {injury}
+            
+            Provide a workout, tactical advice, and a nutrition tip.
+            """
+            
+            with st.spinner("Coach is writing your playbook..."):
+                response = model.generate_content(user_prompt)
+                st.subheader("Your AI-Powered Playbook")
+                st.markdown(response.text)
+                
+    except Exception as e:
+        st.error(f"Error: {e}. Check if your API Key is valid and model name is correct.")
