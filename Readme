@@ -1,205 +1,184 @@
+🎨 ArtRestorer AI
+A Generative AI–Powered Smart Assistant for Art Restoration Support
+📌 Project Overview
 
+ArtRestorer AI is a generative AI–powered web application designed to support the digital restoration and interpretation of damaged, faded, or partially lost artworks. The application assists museum curators, art historians, conservators, and students by generating intelligent, culturally sensitive restoration suggestions using descriptive textual inputs. Instead of relying on image uploads, the system works entirely through structured text descriptions, making it lightweight, accessible, and adaptable across diverse heritage contexts.
 
-# CoachBot AI – A Generative AI-Powered Smart Fitness Web Application
-App Link: https://ofreyuftfsdtwekjxcte2f.streamlit.app/
-## Introduction
+The core objective of ArtRestorer AI is to bridge the gap between traditional art restoration expertise and modern artificial intelligence. By leveraging advanced generative language models, the system helps infer missing artistic elements, stylistic continuity, symbolic meaning, and historical context while respecting the original cultural and artistic integrity of the artwork.
 
-CoachBot AI is a generative AI-powered web application designed to provide personalized sports coaching, training plans, recovery guidance, and nutrition advice for young athletes. The application leverages Google’s Gemini 1.5 Pro model and integrates it within a Streamlit-based web interface to deliver real-time, adaptive coaching recommendations.
+🎯 Problem Definition and Motivation
 
-The core objective of CoachBot AI is to bridge the accessibility gap in professional sports coaching, particularly for youth athletes who may not have access to trained coaches, structured training programs, or injury management guidance. By combining structured prompt engineering with generative AI capabilities, the system produces context-aware and position-specific outputs that simulate the reasoning of a knowledgeable sports coach.
+Cultural heritage institutions around the world face increasing challenges in preserving aging artworks. Many pieces suffer from fading pigments, water damage, erosion, missing sections, or incomplete documentation. Traditional restoration requires extensive expertise, time, and historical research, which may not always be readily available.
 
-The platform emphasizes safety, personalization, motivation, and structured output, ensuring that the generated plans are suitable for teenagers and young athletes.
+ArtRestorer AI addresses this problem by providing AI-assisted restoration guidance based on:
 
----
+Artistic style and historical period
 
-## Problem Statement
+Material and medium characteristics
 
-Many aspiring young athletes lack access to professional coaching due to geographical, financial, or institutional limitations. As a result, they often follow generic workout plans found online, which may not consider:
+Descriptions of damage or deterioration
 
-* Sport-specific positional demands
-* Injury history or physical limitations
-* Age-appropriate training intensity
-* Tactical development needs
-* Nutritional requirements
+Cultural and symbolic context
 
-Improper training can lead to burnout, overtraining, injury recurrence, and stagnation in performance. There is a need for an intelligent system capable of providing structured, adaptive, and safe guidance tailored to the athlete’s profile.
+The system does not replace human restorers, but instead acts as a smart decision-support tool that accelerates research, inspires plausible restoration approaches, and improves accessibility to heritage knowledge.
 
-CoachBot AI addresses this gap by using generative AI to create customized training and development plans based on user-provided inputs.
+🔬 Research Background
 
----
+The project draws inspiration from both traditional art restoration practices and modern AI-assisted cultural heritage research. Conventional restorers rely heavily on stylistic inference, symmetry, material continuity, and historical references to reconstruct missing elements. Recent studies show that generative AI models can simulate these reasoning processes by learning patterns in language, style, and historical descriptions.
 
-## Solution Overview
+Key research insights that influenced this project include:
 
-CoachBot AI is built as an interactive web application using:
+Restoration is most effective when grounded in period-specific styles and materials
 
-* Streamlit for the frontend user interface
-* Google Gemini 1.5 Pro for generative AI processing
-* Prompt engineering techniques to ensure high-quality, structured outputs
+Over-restoration can harm authenticity, so AI outputs must remain suggestive, not definitive
 
-The application collects structured input from the user, including:
+Text-based generative AI can successfully emulate visual reasoning when prompts are detailed and well-structured
 
-* Sport (e.g., football, cricket, basketball)
-* Position (e.g., striker, bowler, goalkeeper)
-* Main goal (e.g., stamina improvement, speed development)
-* Injury history (e.g., ankle sprain, knee strain)
-* Diet preference (veg/non-veg)
-* Training intensity level (low, moderate, high)
-* Selected feature (e.g., full training plan, recovery plan)
+Cultural sensitivity is essential when interpreting religious, symbolic, or indigenous artworks
 
-These inputs are embedded into a carefully designed prompt and sent to the Gemini 1.5 Pro model. The AI then generates a personalized and structured response tailored to the athlete’s needs.
+These findings shaped the decision to use descriptive prompt-based generation rather than automated image reconstruction.
 
----
+🤖 Model Selection and Configuration
 
-## Key Features
+ArtRestorer AI uses Gemini 1.5 Pro, a large multimodal generative AI model capable of deep contextual understanding, reasoning, and creative generation.
 
-CoachBot AI includes multiple coaching modules designed to simulate real-world sports guidance:
+Model Integration
 
-### 1. Full Training Plan Generator
+API integrated using the google-generativeai Python library
 
-Creates structured weekly or session-based workout plans aligned with the athlete’s sport, position, and intensity level.
+Connected to a Python-based Streamlit web application
 
-### 2. Injury Recovery Plan
+Accepts structured user input via text fields
 
-Generates safe rehabilitation-oriented training suggestions that avoid high-risk movements and include mobility work.
+Key Input Parameters
 
-### 3. Nutrition Guide
+Artwork type (painting, sculpture, textile, manuscript)
 
-Provides structured meal planning advice aligned with training intensity and dietary preference.
+Artistic period or style (Renaissance, Mughal, Gothic, etc.)
 
-### 4. Tactical Advice
+Artist name (if known)
 
-Offers sport-specific positional strategies and decision-making guidance.
+Damage description
 
-### 5. Mental Preparation Routine
+Desired output type (restoration suggestion, narrative, symbol interpretation)
 
-Includes visualization techniques, pre-match focus strategies, and mindset conditioning.
+Hyperparameter Tuning
 
-### 6. Warm-Up & Cooldown Plan
+Temperature:
 
-Designs sport-specific mobility, activation, and recovery sequences.
+0.3–0.4 → conservative, historically accurate suggestions
 
-Each feature is powered by dynamic prompt construction, allowing the AI to produce contextualized responses rather than generic advice.
+0.7–0.9 → creative, stylistic interpretations
 
----
+Controlled randomness ensures outputs remain plausible and culturally respectful
 
-## Prompt Engineering Strategy
+🧠 Prompt Engineering Strategy
 
-The effectiveness of CoachBot AI depends heavily on structured prompt engineering. Instead of asking the model vague questions, the application builds detailed instructions such as:
+Prompt engineering is a core strength of ArtRestorer AI. Prompts are carefully designed to combine user input, artistic context, and explicit instructions to guide the model’s reasoning.
 
-* Role assignment (“You are a professional youth sports coach.”)
-* Athlete profile details
-* Safety constraints (teen-safe guidance)
-* Structured formatting requirements
-* Inclusion of duration, safety notes, and injury prevention
+Example Prompt Features
 
-This ensures that the model outputs:
+Style-aware reconstruction
 
-* Clear headings
-* Step-by-step structure
-* Practical timelines
-* Realistic training intensity
-* Motivational but grounded tone
+Region-specific cultural references
 
-Temperature tuning (set at 0.4) balances creativity with reliability, ensuring the output is informative and safe rather than overly imaginative.
+Medium-sensitive restoration logic
 
----
+Damage-type analysis
 
-## Technical Architecture
+Narrative and educational explanations
 
-The architecture follows a simple but effective flow:
+Sample Prompts Used
 
-1. User Input via Streamlit interface
-2. Prompt Construction using f-string formatting
-3. Gemini API Request using google-generativeai
-4. AI Response Generation
-5. Output Display in structured markdown format
+Restore a Renaissance oil painting with faded corner using period-appropriate lighting
 
-The system uses:
+Generate Mughal miniature border patterns with floral symmetry
 
-* Temperature: 0.4 (moderate creativity, high stability)
-* Top-p: 0.9 (controlled diversity)
+Suggest facial reconstruction for an eroded 12th-century sandstone sculpture
 
-This configuration allows the system to generate unique but safe and relevant coaching advice.
+Recreate missing calligraphy in a medieval manuscript
 
----
+Propose textile repair ideas for an 18th-century silk tapestry
 
-## User Interface Design
+Interpret symbolic motifs in religious wall paintings
 
-The user interface is intentionally designed with a dark theme (black and purple gradient background) to create a modern and engaging experience.
+Generate museum-friendly summaries for visitors
 
-UI highlights include:
+Describe color palette restoration after water damage
 
-* Responsive two-column input layout
-* Sidebar motivational quotes from sports films
-* Styled input fields and buttons
-* Visual feedback with loading spinners
-* Warning prompts if required fields are missing
+Suggest ethical restoration boundaries
 
-The motivational corner enhances user engagement while maintaining professionalism.
+Translate historical inscriptions into simplified narratives
 
----
+Each prompt was iteratively refined to improve clarity, accuracy, and output relevance.
 
-## Safety Considerations
+📊 Output Evaluation and Validation
 
-Because the target users are teenagers and youth athletes, safety is prioritized through:
+Generated outputs were evaluated based on:
 
-* Prompt constraints that enforce age-appropriate training
-* Avoidance of high-risk exercises when injuries are specified
-* Inclusion of injury prevention guidance
-* Recommendation to consult real coaches when necessary
+Stylistic consistency with known art movements
 
-The system does not replace professional medical advice but functions as a supportive tool.
+Cultural and historical accuracy
 
----
+Logical coherence and clarity
 
-## Model Testing and Optimization
+Practical usefulness for restoration planning
 
-The model was tested using multiple combinations of:
+Multiple simulations were run across different art forms and periods. Prompts producing vague or overly imaginative outputs were revised, and temperature settings were adjusted to improve precision.
 
-* Different sports (football, cricket, basketball)
-* Various positions
-* Multiple injury scenarios
-* Different intensity levels
+The results demonstrated that ArtRestorer AI consistently produces context-aware, informative, and ethically cautious restoration guidance, making it suitable for educational and professional use.
 
-Temperature values were adjusted between 0.3 and 0.8 during testing. Lower temperatures produced safer, more structured outputs, while higher temperatures introduced creative but occasionally less structured suggestions. A temperature of 0.4 was selected as the optimal balance.
+🌐 Web Application Design and Deployment
+Frontend
 
-Prompt refinement improved:
+Built using Streamlit
 
-* Output clarity
-* Formatting consistency
-* Personalization depth
-* Tactical accuracy
+Simple, intuitive user interface
 
----
+Text input fields with clear guidance
 
-## Social Impact
+Dynamic output display
 
-CoachBot AI promotes inclusive sports development by:
+Backend
 
-* Providing free digital access to structured training
-* Supporting athletes in under-resourced regions
-* Encouraging safe and intelligent training
-* Promoting nutrition awareness
+Python-based logic
 
-By leveraging generative AI responsibly, the application demonstrates how artificial intelligence can empower youth and improve performance outcomes without replacing human coaching.
+Gemini 1.5 API integration
 
----
+Structured prompt generation and response handling
 
-## Conclusion
+Deployment
 
-CoachBot AI is a practical implementation of generative AI in sports development. By integrating Gemini 1.5 Pro within a Streamlit-based web interface, the application transforms structured user input into personalized, position-sensitive, and safety-conscious coaching recommendations.
+Code hosted on GitHub
 
-The project demonstrates technical proficiency in:
+App deployed via Streamlit Cloud
 
-* API integration
-* Prompt engineering
-* Hyperparameter tuning
-* Web app deployment
-* Model validation
+Accessible on desktop and mobile devices
 
-More importantly, it showcases how generative AI can be applied responsibly to solve real-world problems in youth sports development.
+Core Files
 
-CoachBot AI represents a meaningful step toward democratizing access to structured athletic training while maintaining safety, personalization, and engagement.
+app.py – main application logic
 
----
+requirements.txt – dependency list
 
+README.md – project documentation
+
+🚀 Impact and Future Scope
+
+ArtRestorer AI demonstrates how generative AI can meaningfully contribute to cultural heritage preservation without replacing human expertise. The system promotes accessibility, education, and ethical restoration practices.
+
+Future enhancements may include:
+
+Multilingual support
+
+Optional image-assisted reasoning
+
+Comparative output versions
+
+Expert feedback integration
+
+Expansion into archaeology and manuscript studies
+
+📚 Conclusion
+
+ArtRestorer AI successfully showcases the application of generative AI in a real-world, socially impactful domain. By combining research-driven design, effective prompt engineering, and thoughtful deployment, the project highlights how AI can assist—not replace—human creativity and cultural responsibility. This system stands as a practical example of how modern AI tools can help revive history through digital intelligence.
