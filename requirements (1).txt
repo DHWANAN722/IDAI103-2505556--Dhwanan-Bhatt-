@@ -1,9 +1,2 @@
-streamlit==1.31.0
-openai==1.12.0
-
-# Note: The following are built-in Python libraries (no installation needed):
-# - json (built-in)
-# - datetime (built-in)
-# - typing (built-in)
-# - random (built-in)
-# - time (built-in)
+streamlit
+openai
